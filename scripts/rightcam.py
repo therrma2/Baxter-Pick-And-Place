@@ -13,27 +13,17 @@ from std_msgs.msg import UInt16
 import baxter_interface as bi
 
 
-
-#def cb(data,bridge):
-#    try:
-#        frame = bridge.imgmsg_to_cv2(data,"bgr8")
-#    except CvBridgeError,e:
-#        print("==[CAMERA MANAGER]==",e)
-#    cv2.imshow('frame',frame)
-#    cv2.waitKey(25)
-
 def node1cb(data, args ):
-    #rospy.loginfo("new image")
     bridge = args[0]
     pub = args[1]
     try:
-       frame1 = bridge.imgmsg_to_cv2(data, "bgr8")
+       frame = bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError, e:
         print("==[CAMERA MANAGER]==", e)
-    cv2.imshow('frame',frame1)
+    cv2.imshow('frame',frame)
     cv2.waitKey(25)
 
-    hsv = cv2.cvtColor(frame1, cv2.COLOR_BGR2HSV)
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     
 
      
@@ -60,7 +50,10 @@ def node1cb(data, args ):
 
     if len(cnts) > 0:
         c = max(cnts, key=cv2.contourArea)
-        ((x, y), radius) = cv2.minEnclosingCircle(c)
+        rect = cv2.minAreaRect(c)
+        ((x,y),radius) =cv2.minEnclosingCircle(c)
+        box = cv2.cv.BoxPoints(rect)
+        box = np.int0(box)
         M = cv2.moments(c)
         try:
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
@@ -68,16 +61,13 @@ def node1cb(data, args ):
             return
 
         
-        #print "first if"
+        print box
+
         if radius > 20:
-            #print "Radius =",radius
-            #print 'second if'
-            # draw the circle and centroid on the frame,
-            # then update the list of tracked points
-            cv2.circle(mask, (int(x), int(y)), int(radius),(0, 255, 255), 5 )
+            cv2.drawContours(frame,[box],0,(0,255,255),2)
             cv2.circle(mask, center, 5, (0, 0, 255), -1)
 
-        print(x,y)
+        #print(x,y)
 
         x_int = int(x)
         y_int = int(y)
@@ -86,13 +76,8 @@ def node1cb(data, args ):
         pub.publish(msg)    
         
 
-    
-    cv2.imshow('cv_image',mask)
-
-
-       
-    cv2.imshow('frame1',frame1)
     cv2.imshow('dilation',mask)
+    cv2.imshow('newframe',frame)
     
     cv2.waitKey(25)
 
@@ -105,23 +90,18 @@ def node1():
     rospy.init_node("rightcam")
     bridge = CvBridge()
     rightcam = bi.CameraController('right_hand_camera')
-    
-    #rospy.Subscriber('/cameras/right_hand_camera/image',Image,cb,callback_args=bridge)
-    
-    
-    #rospy.init_node('node1', anonymous=True)
-    
+        
     bridge = CvBridge()
 
     cv2.namedWindow ('filter')
 
-    cv2.createTrackbar('HMin','filter',22,255,nothing)
-    cv2.createTrackbar('SMin','filter',78,255,nothing)
-    cv2.createTrackbar('VMin','filter',132,255,nothing)
+    cv2.createTrackbar('HMin','filter',59,255,nothing)
+    cv2.createTrackbar('SMin','filter',77,255,nothing)
+    cv2.createTrackbar('VMin','filter',130,255,nothing)
 
-    cv2.createTrackbar('HMax','filter',200,255,nothing)
-    cv2.createTrackbar('SMax','filter',194,255,nothing)
-    cv2.createTrackbar('VMax','filter',228,255,nothing)
+    cv2.createTrackbar('HMax','filter',90,255,nothing)
+    cv2.createTrackbar('SMax','filter',136,255,nothing)
+    cv2.createTrackbar('VMax','filter',187,255,nothing)
 
 
     pub = rospy.Publisher('node1pub', UInt16, queue_size=10)
