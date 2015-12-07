@@ -168,7 +168,7 @@ def main():
     xfactor = .0008135938
 
 
-    rg.calibrate()
+    #rg.calibrate()
     print right.endpoint_pose()
     Q = Quaternion(x=0.7523426889287905, y=-0.6584930265055371, z=0.0010142237493953393, w=0.019141154854433382)
     S1p = Point(x=.55,y=-.569769,z=.12)
@@ -184,17 +184,17 @@ def main():
     Dj = {'right_e0': 1.4193157223693849, 'right_e1': 0.7152185415344239, 'right_s0': 1.2824079372070314, 'right_s1': -0.23853401224365237, 'right_w0': -1.2916118219238282, 'right_w1': 1.645961383520508, 'right_w2': -0.3512816000244141}
 
 
-    for j in range(6):
+    for j in range(8):
 
         right.move_to_joint_positions(S1j)
     
         i=0
-        while i <4:
+        while i <2:
             current = camdata
             print camdata
             cpose = Point(right.endpoint_pose()['position'].x,right.endpoint_pose()['position'].y,right.endpoint_pose()['position'].z)
 
-            xoffsetpix = current.x-320
+            xoffsetpix = current.x-330
             yoffsetpix = 190-current.y
 
 
@@ -203,16 +203,17 @@ def main():
             goal = Point(xoffsetm+cpose.x,yoffsetm+cpose.y,cpose.z)
 
             right.move_to_joint_positions(ik_solve('right',goal,Q))
-            rospy.sleep(.15)
+            #rospy.sleep(.15)
 
             i = i+1
 
-        slope = camdata.z
-        theta = atan2(slope,1)
-        
+       
 
         goal.z = 0
         right.move_to_joint_positions(ik_solve('right',goal,Q))
+
+        slope = camdata.z
+        theta = atan2(slope,1)
 
         cang = right.joint_angles()
         cang['right_w2'] = cang['right_w2']+theta
@@ -224,7 +225,7 @@ def main():
         right.move_to_joint_positions(ik_solve('right',goal,Fq))
 
         rg.close()
-        rospy.sleep(.2)
+        #rospy.sleep(.2)
         goal.z = .12
         right.move_to_joint_positions(ik_solve('right',goal,Q))
         right.move_to_joint_positions(ik_solve('right',Dp,Q))
