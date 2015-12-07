@@ -225,7 +225,7 @@ def main():
         right.move_to_joint_positions(ik_solve('right',goal,Fq))
 
         rg.close()
-        #rospy.sleep(.2)
+        rospy.sleep(.05)
         goal.z = .12
         right.move_to_joint_positions(ik_solve('right',goal,Q))
         right.move_to_joint_positions(ik_solve('right',Dp,Q))
