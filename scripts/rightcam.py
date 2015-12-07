@@ -28,24 +28,39 @@ def node1cb(data, args ):
     
 
      
-    hmin = cv2.getTrackbarPos('HMin','filter')
-    smin = cv2.getTrackbarPos('SMin','filter')
-    vmin = cv2.getTrackbarPos('VMin','filter')
+    hmin = cv2.getTrackbarPos('gHMin','filter')
+    smin = cv2.getTrackbarPos('gSMin','filter')
+    vmin = cv2.getTrackbarPos('gVMin','filter')
 
-    hmax = cv2.getTrackbarPos('HMax','filter')
-    smax = cv2.getTrackbarPos('SMax','filter')
-    vmax = cv2.getTrackbarPos('VMax','filter')
+    hmax = cv2.getTrackbarPos('gHMax','filter')
+    smax = cv2.getTrackbarPos('gSMax','filter')
+    vmax = cv2.getTrackbarPos('gVMax','filter')
 
-    min_red_vales = np.array([hmin,smin,vmin])
-    max_red_vales = np.array([hmax,smax,vmax])
+    min_green_vales = np.array([hmin,smin,vmin])
+    max_green_vales = np.array([hmax,smax,vmax])
 
-    mask = cv2.inRange(hsv, min_red_vales, max_red_vales)
-    kernel = np.ones((380,380),np.uint8)
-    erosion = cv2.erode(mask,kernel,iterations = 1)#Erode
-    kernel1 = np.ones((380,380),np.uint8)
-    dilation = cv2.dilate(erosion,kernel1,iterations = 1)#Dilate
+    rhmin = cv2.getTrackbarPos('rHMin','filter')
+    rsmin = cv2.getTrackbarPos('rSMin','filter')
+    rvmin = cv2.getTrackbarPos('rVMin','filter')
 
-    cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
+    rhmax = cv2.getTrackbarPos('rHMax','filter')
+    rsmax = cv2.getTrackbarPos('rSMax','filter')
+    rvmax = cv2.getTrackbarPos('rVMax','filter')
+
+    min_red_vales = np.array([rhmin,rsmin,rvmin])
+    max_red_vales = np.array([rhmax,rsmax,rvmax])
+
+    maskgreen = cv2.inRange(hsv, min_green_vales, max_green_vales)
+    maskred = cv2.inRange(hsv, min_red_vales, max_red_vales)
+    #kernel = np.ones((380,380),np.uint8)
+    #erosion = cv2.erode(mask,kernel,iterations = 1)#Erode
+    #kernel1 = np.ones((380,380),np.uint8)
+    #dilation = cv2.dilate(erosion,kernel1,iterations = 1)#Dilate
+
+    maskmain = cv2.addWeighted(maskgreen,0.5,maskred,0.5,0)
+    
+
+    cnts = cv2.findContours(maskmain.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2]
     center = None
     
 
@@ -70,7 +85,7 @@ def node1cb(data, args ):
 
         if radius > 20:
             cv2.drawContours(frame,[box],0,(0,255,255),2)
-            cv2.circle(mask, center, 5, (0, 0, 255), -1)
+            cv2.circle(maskmain, center, 5, (0, 0, 255), -1)
 
         box2 = [[box[0][0],box[0][1]],[box[1][0],box[1][1]],[box[2][0],box[2][1]],[box[3][0],box[3][1]]]
         #print box2
@@ -104,7 +119,7 @@ def node1cb(data, args ):
         pub.publish(msg)    
         
 
-    cv2.imshow('dilation',mask)
+    cv2.imshow('dilation',maskmain)
     cv2.imshow('newframe',frame)
     
     cv2.waitKey(25)
@@ -123,13 +138,21 @@ def node1():
 
     cv2.namedWindow ('filter')
 
-    cv2.createTrackbar('HMin','filter',31,255,nothing)
-    cv2.createTrackbar('SMin','filter',85,255,nothing)
-    cv2.createTrackbar('VMin','filter',118,255,nothing)
+    cv2.createTrackbar('gHMin','filter',31,255,nothing)
+    cv2.createTrackbar('gSMin','filter',85,255,nothing)
+    cv2.createTrackbar('gVMin','filter',118,255,nothing)
 
-    cv2.createTrackbar('HMax','filter',107,255,nothing)
-    cv2.createTrackbar('SMax','filter',255,255,nothing)
-    cv2.createTrackbar('VMax','filter',255,255,nothing)
+    cv2.createTrackbar('gHMax','filter',107,255,nothing)
+    cv2.createTrackbar('gSMax','filter',255,255,nothing)
+    cv2.createTrackbar('gVMax','filter',255,255,nothing)
+
+    cv2.createTrackbar('rHMin','filter',0,255,nothing)
+    cv2.createTrackbar('rSMin','filter',81,255,nothing)
+    cv2.createTrackbar('rVMin','filter',54,255,nothing)
+
+    cv2.createTrackbar('rHMax','filter',179,255,nothing)
+    cv2.createTrackbar('rSMax','filter',234,255,nothing)
+    cv2.createTrackbar('rVMax','filter',255,255,nothing)
 
 
     pub = rospy.Publisher('rcampub', Point, queue_size=10)
