@@ -75,15 +75,18 @@ def node1cb(data, args ):
         M = cv2.moments(c)
         try:
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-        except ZeroDivisonError:
+        except:
             return
+            #center = 1
+            #msg = Point(-500,-500,-500)
+            
         #print "--------------------------------------------------------"
 
         #print "box0", box[0]
         #print "box1", box[1]
         #print "box2", box[2]
         #print "box3", box[3]
-
+        #if center != 1:
         if radius > 20:
             cv2.drawContours(frame,[box],0,(0,255,255),2)
             cv2.circle(maskmain, center, 5, (0, 0, 255), -1)
@@ -101,7 +104,7 @@ def node1cb(data, args ):
         boxy = [box2[0][1],box2[1][1],box2[2][1]]
         
         index2 = boxy.index(max(boxy))
-
+            
         pt2 = box2.pop(index2)
         #print "pt2",pt2
         #print(x,y)
@@ -128,6 +131,12 @@ def node1cb(data, args ):
 
 def nothing(self):
     pass
+
+
+def smilecb(data,pub2):
+    if data = 1:
+        pub2.publish
+
 
 
 def node1():
@@ -158,9 +167,11 @@ def node1():
 
 
     pub = rospy.Publisher('rcampub', Point, queue_size=10)
-    pub2 = rospy.Publisher('/robot/xdisplay',Image,latch = True)
+    pub2 = rospy.Publisher('/robot/xdisplay',Image,queue_size=10)
 
     rospy.Subscriber('/cameras/right_hand_camera/image', Image, node1cb, callback_args=(bridge, pub,pub2))
+
+    rospy.Subscriber('/smile',UInt8,smilecb,pub2)
     
     print 'here before spin'
     rospy.spin()

@@ -15,6 +15,7 @@ from geometry_msgs.msg import (
 )
 
 from std_msgs.msg import Header
+from std_msgs.msg import UInt8
 from baxter_core_msgs.srv import (
     SolvePositionIK,
     SolvePositionIKRequest,
@@ -36,6 +37,7 @@ import numpy as np
 def ik_solve(limb,p,q):
     #rospy.init_node("node1")
     global right
+    global left
     ns = "ExternalTools/" + limb + "/PositionKinematicsNode/IKService"
     iksvc = rospy.ServiceProxy(ns, SolvePositionIK)
     ikreq = SolvePositionIKRequest()
@@ -113,6 +115,7 @@ def ik_solve(limb,p,q):
         else:
             print("INVALID POSE - No Valid Joint Solution Found.")
             
+            
             noise= np.random.normal(0,0.25,7)
             
             '''print right.joint_angles().values()
@@ -142,8 +145,15 @@ def ik_solve(limb,p,q):
             ikreq.seed_angles = [js]
             
             resp = iksvc(ikreq)
-
-    return limb_joints
+    try:
+        return limb_joints
+    except:
+        mess = 1
+        smile.publish(mess)
+        left.move_to_joint_positions({'left_s0': -0.7597039843322755, 'left_s1': -0.9407137170959473, 'left_w0': 0.7942185520202637, 'left_w1': -0.06596117380371094, 'left_w2': -1.8983012228393557, 'left_e0': 2.859723680548096, 'left_e1': 0.1580000209716797})
+        right.move_to_joint_positions({'right_s0': -0.7597039843322755, 'right_s1': -0.9407137170959473, 'right_w0': 0.7942185520202637, 'right_w1': -0.06596117380371094, 'right_w2': -1.8983012228393557, 'right_e0': 2.859723680548096, 'right_e1': 0.1580000209716797})
+        sys.exit("All Done!")
+        
 
 def camcb(data):
     global camdata
@@ -160,7 +170,12 @@ def main():
     #print "camdata is" ,camdata
     global right
     global rg
+    global left
+    global smile
+    smile = rospy.Publisher("smile",UInt8,queue_size=10)
+
     right = baxter_interface.Limb('right')
+    left = baxter_interface.Limb('left')
     camdata = Point()
     rg = baxter_interface.Gripper('right')
     
@@ -171,25 +186,28 @@ def main():
         rg.calibrate()
     #rg.calibrate()
     print right.endpoint_pose()
+    print right.joint_angles()
     Q = Quaternion(x=0.7523426889287905, y=-0.6584930265055371, z=0.0010142237493953393, w=0.019141154854433382)
     S1p = Point(x=.55,y=-.569769,z=.12)
-    S2p = Point(.55,-.2651429,.12)
+    S2p = Point(.70,-.2651429,.12)
     S3p = Point(.55,.00738,.12)
 
     S1j = ik_solve('right',S1p,Q)
     S2j = ik_solve('right',S2p,Q)
     S3j = ik_solve('right',S3p,Q)   
     
-    Dp = Point(x=0.5243308743510079, y=0.34035668580244005, z=0.20640086748510136)
-
+    #Dp = Point(x=0.5243308743510079, y=0.34035668580244005, z=0.20640086748510136)
+    Dp = Point(x=0.5719869428372248, y=-1.0075248563301191, z=0.13966290441126045)
+    Dq = Quaternion(x=-0.5072676977914469, y=0.8364736871351672, z=-0.20583706250527933, w=-0.024947088147947636)
     Dj = {'right_e0': 1.4193157223693849, 'right_e1': 0.7152185415344239, 'right_s0': 1.2824079372070314, 'right_s1': -0.23853401224365237, 'right_w0': -1.2916118219238282, 'right_w1': 1.645961383520508, 'right_w2': -0.3512816000244141}
 
 
-    for j in range(8):
+    for j in range(12):
 
         right.move_to_joint_positions(S1j)
     
         i=0
+        #move on top of block
         while i <2:
             current = camdata
             print camdata
@@ -209,15 +227,24 @@ def main():
             i = i+1
 
        
-
+        #move down to z= 0
         goal.z = 0
         right.move_to_joint_positions(ik_solve('right',goal,Q))
+        
+        #iterate again
+        
+
+
+
 
         slope = camdata.z
         theta = atan2(slope,1)
 
         cang = right.joint_angles()
         cang['right_w2'] = cang['right_w2']+theta
+
+
+
         right.move_to_joint_positions(cang)
         
         Fq = right.endpoint_pose()['orientation']
@@ -229,7 +256,7 @@ def main():
         rospy.sleep(.05)
         goal.z = .12
         right.move_to_joint_positions(ik_solve('right',goal,Q))
-        right.move_to_joint_positions(ik_solve('right',Dp,Q))
+        right.move_to_joint_positions(ik_solve('right',Dp,Dq))
         rg.open()
 
 
