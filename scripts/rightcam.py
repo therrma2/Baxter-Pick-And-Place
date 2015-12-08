@@ -116,7 +116,7 @@ def node1cb(data, args ):
         
         msg = Point(x,y,slope)
 
-        pub.publish(msg)    
+        pub.publish(msg, frame)    
         
 
     cv2.imshow('dilation',maskmain)
@@ -155,7 +155,7 @@ def node1():
     cv2.createTrackbar('rVMax','filter',255,255,nothing)
 
 
-    pub = rospy.Publisher('rcampub', Point, queue_size=10)
+    pub = rospy.Publisher('rcampub', Point, Image, queue_size=10)
     rospy.Subscriber('/cameras/right_hand_camera/image', Image, node1cb, callback_args=(bridge, pub))
     
     print 'here before spin'
