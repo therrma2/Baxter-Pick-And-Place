@@ -8,13 +8,18 @@ import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
-from std_msgs.msg import UInt16
+from std_msgs.msg import UInt16,UInt8
 from geometry_msgs.msg import Point
 
 import baxter_interface as bi
 
+global T
+T = 0
 
 def node1cb(data, args ):
+    global T
+    if T == 1:
+        return
     bridge = args[0]
     pub = args[1]
     pub2 = args[2]
@@ -70,7 +75,7 @@ def node1cb(data, args ):
         rect = cv2.minAreaRect(c)
         ((x,y),radius) =cv2.minEnclosingCircle(c)
         box = cv2.cv.BoxPoints(rect)
-        print box
+        #print box
         box = np.int0(box)
         M = cv2.moments(c)
         try:
@@ -134,9 +139,15 @@ def nothing(self):
 
 
 def smilecb(data,pub2):
-    if data = 1:
-        pub2.publish
-
+    global T
+    T = 1
+    img = cv2.imread('Smiley.jpg')
+    bridge2 = CvBridge()
+    msg = bridge2.cv2_to_imgmsg(img, encoding="bgr8")
+    rospy.sleep(.2)
+    pub2.publish(msg)
+    print "callback triggered"
+    sys.exit("Yay!")
 
 
 def node1():
@@ -171,7 +182,7 @@ def node1():
 
     rospy.Subscriber('/cameras/right_hand_camera/image', Image, node1cb, callback_args=(bridge, pub,pub2))
 
-    rospy.Subscriber('/smile',UInt8,smilecb,pub2)
+    rospy.Subscriber('smile',UInt8,smilecb,pub2)
     
     print 'here before spin'
     rospy.spin()
