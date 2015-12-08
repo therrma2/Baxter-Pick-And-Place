@@ -167,7 +167,8 @@ def main():
     yfactor = .000667917
     xfactor = .0008135938
 
-
+    if rg.calibrated() == False:
+        rg.calibrate()
     #rg.calibrate()
     print right.endpoint_pose()
     Q = Quaternion(x=0.7523426889287905, y=-0.6584930265055371, z=0.0010142237493953393, w=0.019141154854433382)
