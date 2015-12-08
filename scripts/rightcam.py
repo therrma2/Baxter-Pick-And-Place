@@ -17,6 +17,7 @@ import baxter_interface as bi
 def node1cb(data, args ):
     bridge = args[0]
     pub = args[1]
+    pub2 = args[2]
     try:
        frame = bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError, e:
@@ -115,8 +116,9 @@ def node1cb(data, args ):
         y_int = int(y)
         
         msg = Point(x,y,slope)
-
-        pub.publish(msg, frame)    
+        msg2 = bridge.cv2_to_imgmsg(frame,encoding = "bgr8")
+        pub.publish(msg)
+        pub2.publish(msg2)    
         
 
     cv2.imshow('dilation',maskmain)
@@ -155,8 +157,10 @@ def node1():
     cv2.createTrackbar('rVMax','filter',255,255,nothing)
 
 
-    pub = rospy.Publisher('rcampub', Point, Image, queue_size=10)
-    rospy.Subscriber('/cameras/right_hand_camera/image', Image, node1cb, callback_args=(bridge, pub))
+    pub = rospy.Publisher('rcampub', Point, queue_size=10)
+    pub2 = rospy.Publisher('/robot/xdisplay',Image,latch = True)
+
+    rospy.Subscriber('/cameras/right_hand_camera/image', Image, node1cb, callback_args=(bridge, pub,pub2))
     
     print 'here before spin'
     rospy.spin()
