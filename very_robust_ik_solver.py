@@ -63,7 +63,7 @@ import baxter_interface
 
 from baxter_interface import CHECK_VERSION
 
-def ik_test(limb):
+def ik_test(limb,Rightxyz,Leftxyz):
     rospy.init_node("rsdk_ik_service_client")
     ns = "ExternalTools/" + limb + "/PositionKinematicsNode/IKService"
     iksvc = rospy.ServiceProxy(ns, SolvePositionIK)
@@ -76,9 +76,9 @@ def ik_test(limb):
             header=hdr,
             pose=Pose(
                 position=Point(
-                    x=0.657579481614,
-                    y=0.851981417433,
-                    z=0.0388352386502,
+                    x=Leftxyz[0],
+                    y=Leftxyz[1],
+                    z=Leftxyz[2],
                 ),
                 orientation=Quaternion(
                     x=-0.366894936773,
@@ -92,9 +92,9 @@ def ik_test(limb):
             header=hdr,
             pose=Pose(
                 position=Point(
-                    x=0.656982770038,
-                    y=-0.852598021641,
-                    z=0.0388609422173,
+                    x=Rightxyz[0],
+                    y=Rightxyz[1],
+                    z=Rightxyz[2],
                 ),
                 orientation=Quaternion(
                     x=0.367048116303,
@@ -225,9 +225,12 @@ def main():
     )
     args = parser.parse_args(rospy.myargv()[1:])
     
+
+    Rightxyz= [0.656982770038,-0.852598021641,0.0388609422173]
+    Leftxyz = [0.657579481614,0.851981417433,0.0388352386502]
     
 
-    return ik_test(args.limb)
+    return ik_test(args.limb,Rightxyz,Leftxyz)
 
 if __name__ == '__main__':
     sys.exit(main())
