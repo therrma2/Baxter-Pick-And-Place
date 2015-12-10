@@ -175,7 +175,9 @@ def main():
     smile = rospy.Publisher("smile",UInt8,queue_size=10)
 
     right = baxter_interface.Limb('right')
+    right.set_joint_position_speed(1.0)
     left = baxter_interface.Limb('left')
+    left.set_joint_position_speed(1.0)
     camdata = Point()
     rg = baxter_interface.Gripper('right')
     
@@ -202,7 +204,7 @@ def main():
     Dj = {'right_e0': 1.4193157223693849, 'right_e1': 0.7152185415344239, 'right_s0': 1.2824079372070314, 'right_s1': -0.23853401224365237, 'right_w0': -1.2916118219238282, 'right_w1': 1.645961383520508, 'right_w2': -0.3512816000244141}
 
 
-    for j in range(12):
+    for j in range(6):
 
         right.move_to_joint_positions(S1j)
     
@@ -259,8 +261,13 @@ def main():
         right.move_to_joint_positions(ik_solve('right',Dp,Dq))
         rg.open()
 
+    mess = 1
 
-    
+    left.move_to_joint_positions({'left_s0': -0.7597039843322755, 'left_s1': -0.9407137170959473, 'left_w0': 0.7942185520202637, 'left_w1': -0.06596117380371094, 'left_w2': -1.8983012228393557, 'left_e0': 2.859723680548096, 'left_e1': 0.1580000209716797})
+    right.move_to_joint_positions({'right_s0': -0.7597039843322755, 'right_s1': -0.9407137170959473, 'right_w0': 0.7942185520202637, 'right_w1': -0.06596117380371094, 'right_w2': -1.8983012228393557, 'right_e0': 2.859723680548096, 'right_e1': 0.1580000209716797})
+
+    smile.publish(mess)
+    sys.exit("All Done!")    
 
 
 
