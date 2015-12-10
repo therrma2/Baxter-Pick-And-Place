@@ -230,8 +230,8 @@ def main():
 
        
         #move down to z= 0
-        goal.z = 0
-        right.move_to_joint_positions(ik_solve('right',goal,Q))
+        #goal.z = 0
+        #right.move_to_joint_positions(ik_solve('right',goal,Q))
         
         #iterate again
         
