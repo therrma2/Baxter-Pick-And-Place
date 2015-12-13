@@ -204,13 +204,13 @@ def main():
     Dj = {'right_e0': 1.4193157223693849, 'right_e1': 0.7152185415344239, 'right_s0': 1.2824079372070314, 'right_s1': -0.23853401224365237, 'right_w0': -1.2916118219238282, 'right_w1': 1.645961383520508, 'right_w2': -0.3512816000244141}
 
 
-    for j in range(6):
+    for j in range(0):
 
         right.move_to_joint_positions(S1j)
     
         i=0
         #move on top of block
-        while i <2:
+        while i <3:
             current = camdata
             print camdata
             cpose = Point(right.endpoint_pose()['position'].x,right.endpoint_pose()['position'].y,right.endpoint_pose()['position'].z)
