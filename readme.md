@@ -28,7 +28,7 @@ This file contains the main structure of the pick place program.  The `ik_solve(
 	Launches both the *rightcam.py* nodeand the *movenode.py* node.
 
 
-#### Image Processing:
+* #### Image Processing:
 
 We found our balls and squares using colour filtering image processing from the
 OpenCV library. We have set defaults to look for green and red filters in the
@@ -53,7 +53,6 @@ The  `ik_solve() ` calls an `Inverse-Kinematics(IK)` service provided by the ROS
 
 It takes three elements: limb, desired Quartesian coordinate and orientation of the end effector of the Baxter and will return seven joint angles that will get the arm to that position. 
 
-Refering to Inverse Kinematics Solver Service on the Baxter API reference page:
-<div>http://sdk.rethinkrobotics.com/wiki/API_Reference#arm-joints </div>
+Refering to Inverse Kinematics Solver Service on the Baxter API reference page:<div>http://sdk.rethinkrobotics.com/wiki/API_Reference#arm-joints </div>
 
 The  `seed_mode ` is always set to 1 to use the user defined seeds as the initial joint angles guess for ik. The  `seed_angels ` are all very close to the current joint angles that must be in the Baxter's workplace. Since it is normally hard to get ik converge to a solution, random noise has been generated and added to the current joint angles. A list of seed angles can thus be implemented to try for at most 20 times to solve the inverse kinematics, which should be robust enough to find a valid solution. 
