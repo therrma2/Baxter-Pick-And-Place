@@ -18,7 +18,16 @@ Capabilities:
 Files In Package:
       rightcam.py
       movenode.py
+      pickplace.launch
 
+rightcam.py:
+	This file controls and processes the right hand camera on baxter
+
+movenode.py:
+	This file contains the main structure of the pick place program.  The ik_solve() function takes a cartesian pose and returns a valid joint state position.  The main() function subscribesto the data published by the right cam node and uses it to direct the pick and place operation.
+
+pickplace.launch:
+	Launches both the rightcam.py nodeand the movenode.py node.
 
 
 Image Processing:
