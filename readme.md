@@ -28,7 +28,7 @@ This file contains the main structure of the pick place program.  The `ik_solve(
 	Launches both the *rightcam.py* nodeand the *movenode.py* node.
 
 
-* #### Image Processing:
+#### Image Processing:
 
 We found our balls and squares using colour filtering image processing from the
 OpenCV library. We have set defaults to look for green and red filters in the
