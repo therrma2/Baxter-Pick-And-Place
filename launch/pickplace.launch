@@ -1,0 +1,7 @@
+<launch>
+  <node name = "node1" pkg = "project" type = "rightcam.py"/>  
+  <node name = "movenode" pkg = "project" type = "movenode.py"/>
+
+  
+
+</launch>
