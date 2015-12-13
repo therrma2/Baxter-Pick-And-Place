@@ -51,7 +51,7 @@ itself to pick the object.
 
 Inverse Kinematics:
 
-The **ik_solve()** calls an Inverse-Kinematics (IK) service provided by the ROS node `/ExternalTools/<limb>/PositionKinematicsNode/` 
+The **ik_solver** calls an Inverse-Kinematics (IK) service provided by the ROS node `/ExternalTools/<limb>/PositionKinematicsNode/` 
 
 It takes three elements: limb, desired Quartesian coordinate and orientation of the end effector of the Baxter and will return seven joint angles that will get the arm to that position. 
 
